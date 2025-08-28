@@ -1,0 +1,111 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "products": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "productId": {
+                                            "type": "integer"
+                                        },
+                                        "productName": {
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "price": {
+                                            "type": "number"
+                                        },
+                                        "quantity": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "required": [
+                                        "productId",
+                                        "productName",
+                                        "description",
+                                        "price",
+                                        "quantity"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "actions": {
+            "Create_CSV_table": {
+                "runAfter": {},
+                "type": "Table",
+                "inputs": {
+                    "from": "@triggerBody()?['products']",
+                    "format": "CSV"
+                }
+            },
+            "Create_blob_(V2)": {
+                "runAfter": {
+                    "Create_CSV_table": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureblob']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "body": "@body('Create_CSV_table')",
+                    "headers": {
+                        "Content-Type": "text/csv",
+                        "ReadFileMetadataFromServer": true
+                    },
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files",
+                    "queries": {
+                        "folderPath": "/data",
+                        "name": "pracBlob",
+                        "queryParametersSingleEncoded": true
+                    }
+                },
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {
+                "azureblob": {
+                    "id": "/subscriptions/179dd20b-e2ea-45a0-8003-473940f3d4f1/providers/Microsoft.Web/locations/centralindia/managedApis/azureblob",
+                    "connectionId": "/subscriptions/179dd20b-e2ea-45a0-8003-473940f3d4f1/resourceGroups/learn-08171f2a-254d-49e6-abcb-8faa7bbf8f57/providers/Microsoft.Web/connections/azureblob",
+                    "connectionName": "azureblob"
+                }
+            }
+        }
+    }
+}
