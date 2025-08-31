@@ -1,8 +1,6 @@
-# Logic App: Greeting Array
+# Logic App-5: Use of For Each
 
-This **Logic App** receives an array of names via an HTTP POST request, appends `"Hello "` to each name, and returns the greetings array.
-
----
+What it does: This **Logic App** receives an array of names via an HTTP POST request, appends `"Hello "` to each name, and returns the greetings array.
 
 ## 🚀 Features
 
@@ -44,7 +42,8 @@ This **Logic App** receives an array of names via an HTTP POST request, appends 
       }
     }
     ```
-    ![alt text](image.png)
+<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/f8e77694-2ae2-4456-b76f-eca9da145052" />
+
 
 ### 4. Initialize Array Variable
 
@@ -53,7 +52,8 @@ This **Logic App** receives an array of names via an HTTP POST request, appends 
   - **Name**: `greetings`
   - **Type**: `Array`
   - **Value**: `[]`
-    ![alt text](image-1.png)
+<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/bcfe2bc1-d6af-4afa-b478-1462d837b32b" />
+
 
 ### 5. Loop Through Names (For Each)
 
@@ -61,12 +61,14 @@ This **Logic App** receives an array of names via an HTTP POST request, appends 
 - Configure:
 
   - **Select an output from previous steps**: `@triggerBody()?['names']`
-    ![alt text](image-2.png)
+<img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/4d5553a7-370a-4747-a493-077202e34b1c" />
+
 
 - Inside the loop, add action → **Variables** → **Append to array variable**:
   - **Name**: `greetings`
   - **Value**: `@concat('Hello ', item())`
-    ![alt text](image-3.png)
+<img width="800" height="548" alt="image" src="https://github.com/user-attachments/assets/f37df425-052c-425c-a6af-b99787b68690" />
+
 
 ### 6. Send Response
 
@@ -79,7 +81,8 @@ This **Logic App** receives an array of names via an HTTP POST request, appends 
   "greetings": "@variables('greetings')"
 }
 `
-    ![alt text](image-4.png)
+<img width="600" height="575" alt="image" src="https://github.com/user-attachments/assets/f0ec5638-b17f-4432-b394-44f600ec7b8a" />
+
 
 ### 7. Save & Test
 
@@ -92,4 +95,6 @@ This **Logic App** receives an array of names via an HTTP POST request, appends 
   }
   ```
   The Workflow
-  ![alt text](image-5.png)
+<img width="600" height="700" alt="image" src="https://github.com/user-attachments/assets/1386b1fe-ff8a-4b64-bebe-b56a93dbb587" />
+
+
