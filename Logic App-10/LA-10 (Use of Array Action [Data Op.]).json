@@ -1,0 +1,163 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "employees": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "dept": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "name",
+                                        "email",
+                                        "dept"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "actions": {
+            "Create_CSV_table": {
+                "runAfter": {},
+                "type": "Table",
+                "inputs": {
+                    "from": "@triggerBody()?['employees']",
+                    "format": "CSV"
+                }
+            },
+            "Create_HTML_table": {
+                "runAfter": {
+                    "Create_CSV_table": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Table",
+                "inputs": {
+                    "from": "@triggerBody()?['employees']",
+                    "format": "HTML",
+                    "columns": [
+                        {
+                            "header": "Employee Name",
+                            "value": "@item()?['name']"
+                        },
+                        {
+                            "header": "Email Address",
+                            "value": "@item()?['email']"
+                        },
+                        {
+                            "header": "Department",
+                            "value": "@item()?['dept']"
+                        }
+                    ]
+                }
+            },
+            "Filter_array": {
+                "runAfter": {
+                    "Create_HTML_table": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Query",
+                "inputs": {
+                    "from": "@triggerBody()?['employees']",
+                    "where": "@equals(item()?['dept'], '\"IT\"')"
+                }
+            },
+            "Select": {
+                "runAfter": {
+                    "Filter_array": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Select",
+                "inputs": {
+                    "from": "@triggerBody()?['employees']",
+                    "select": {
+                        "Name": "@item()?['name']"
+                    }
+                }
+            },
+            "Join": {
+                "runAfter": {
+                    "Select": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Join",
+                "inputs": {
+                    "from": "@body('Select')",
+                    "joinWith": ","
+                }
+            },
+            "Select_1": {
+                "runAfter": {
+                    "Join": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Select",
+                "inputs": {
+                    "from": "@triggerBody()?['employees']",
+                    "select": {
+                        "Employee-Name": "@item()?['name']",
+                        "empMail": "@item()?['email']"
+                    }
+                }
+            },
+            "Response": {
+                "runAfter": {
+                    "Select_1": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Response",
+                "kind": "Http",
+                "inputs": {
+                    "statusCode": 200,
+                    "body": {
+                        "CSV Table": "@outputs('Create_CSV_table')",
+                        "HTML-table": "@outputs('Create_HTML_table')",
+                        "Filtered Array": "@outputs('Filter_array')",
+                        "Joined Names": "@outputs('Join')",
+                        "Selected Array": "@outputs('Select_1')"
+                    }
+                }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {}
+        }
+    }
+}
