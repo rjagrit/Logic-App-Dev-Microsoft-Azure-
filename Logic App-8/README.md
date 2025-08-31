@@ -88,11 +88,17 @@ This **Logic App** receives an array of users via HTTP POST, checks which users 
 ---
 
 ### 8. Configure Actions for Condition
+<img width="700" height="496" alt="image" src="https://github.com/user-attachments/assets/ab7aa282-f75d-4d15-8ecd-319cd086a817" />
+<img width="700" height="283" alt="image" src="https://github.com/user-attachments/assets/80b7b932-c8e7-4542-a7db-7add29a8e44d" />
 
 ---
 
 ### 9. Send Response
+<img width="700" height="374" alt="image" src="https://github.com/user-attachments/assets/1c50eee7-9e08-43ec-a139-94b656837f92" />
 
 ---
 
 ### 10. Save & Test
+<img width="700" height="421" alt="image" src="https://github.com/user-attachments/assets/96c93c48-d1d1-4d97-8653-21259ebf511a" />
+<img width="700" height="384" alt="image" src="https://github.com/user-attachments/assets/2a7318e5-7a3f-47ca-8083-40837111c319" />
+
