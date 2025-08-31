@@ -25,5 +25,3 @@ Order status handling using a **Switch** control and HTTP trigger.
 <img width="1374" height="604" alt="image" src="https://github.com/user-attachments/assets/61de0513-dd6d-4c97-bfcc-0134e4b2687e" />
 <img width="1384" height="610" alt="image" src="https://github.com/user-attachments/assets/1ded5429-fd38-4341-ab59-a2b366790d5d" />
 <img width="1371" height="616" alt="image" src="https://github.com/user-attachments/assets/633dea93-ecce-4422-bb58-7b923c370908" />
-
----
