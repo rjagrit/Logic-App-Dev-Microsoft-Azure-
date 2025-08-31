@@ -84,7 +84,15 @@ if (inputNumber % 2 === 0) {
   - Run after Execute_JavaScript_code succeeds
  <img width="800" height="565" alt="image" src="https://github.com/user-attachments/assets/fc7ed422-b99d-40f0-8cd5-c1c576683d6f" />
 
- ### The Workflow
+### The Output
+<img width="800" height="373" alt="image" src="https://github.com/user-attachments/assets/10eb5098-a782-482f-a8d8-c3424570c7d2" />
+<img width="800" height="361" alt="image" src="https://github.com/user-attachments/assets/524503b3-3f77-4b19-a7bc-6e3cddf5ea37" />
+<img width="800" height="336" alt="image" src="https://github.com/user-attachments/assets/e8095ee3-3c86-4479-bf9f-4d289b8b299b" />
+
+---
+
+ ## The Workflow
  <img width="400" height="651" alt="image" src="https://github.com/user-attachments/assets/75e30401-3141-49da-9b71-ee07ffa7bc63" />
+
 
 
