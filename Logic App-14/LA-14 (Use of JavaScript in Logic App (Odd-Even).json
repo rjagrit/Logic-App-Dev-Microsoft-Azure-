@@ -1,0 +1,50 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "actions": {
+            "Execute_JavaScript_code": {
+                "type": "JavaScriptCode",
+                "inputs": {
+                    "code": "var inputNumber = workflowContext.trigger.outputs.body.number;\r\n\r\n// Check if undefined or null\r\nif (inputNumber === undefined || inputNumber === null) {\r\n    return { \"message\": \"Input number is undefined. Please provide a number.\" };\r\n}\r\n\r\n// Check if input is not a number\r\nif (typeof inputNumber !== \"number\" || isNaN(inputNumber)) {\r\n    return { \"message\": \"Invalid input. Please provide a valid number.\" };\r\n}\r\n\r\n// Check Odd or Even\r\nif (inputNumber % 2 === 0) {\r\n    return { \"message\": inputNumber + \" is Even\" };\r\n} else {\r\n    return { \"message\": inputNumber + \" is Odd\" };\r\n}\r\n"
+                },
+                "runAfter": {}
+            },
+            "Response": {
+                "type": "Response",
+                "kind": "Http",
+                "inputs": {
+                    "statusCode": 200,
+                    "body": "@outputs('Execute_JavaScript_code')"
+                },
+                "runAfter": {
+                    "Execute_JavaScript_code": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "outputs": {},
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "number": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}
