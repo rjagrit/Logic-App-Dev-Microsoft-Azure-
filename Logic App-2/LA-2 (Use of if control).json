@@ -1,0 +1,98 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "actions": {
+            "Compose_Request": {
+                "type": "Compose",
+                "inputs": {
+                    "content": "@triggerBody()"
+                },
+                "runAfter": {}
+            },
+            "Address_Validation": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        {
+                            "equals": [
+                                "@triggerBody()?['contact']?['address']",
+                                "United States"
+                            ]
+                        }
+                    ]
+                },
+                "actions": {
+                    "Response": {
+                        "type": "Response",
+                        "kind": "Http",
+                        "inputs": {
+                            "statusCode": 200,
+                            "body": {
+                                "message": "@{concat('request is from ',triggerBody()?['contact']?['address'])}"
+                            }
+                        }
+                    }
+                },
+                "else": {
+                    "actions": {
+                        "Response-copy": {
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 500,
+                                "body": {
+                                    "message": "@{concat('request is from ',triggerBody()?['contact']?['address'])}"
+                                }
+                            }
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Compose_Request": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "outputs": {},
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "contact": {
+                                "type": "object",
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "contact": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "order_number": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}
