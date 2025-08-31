@@ -1,0 +1,133 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST"
+                }
+            }
+        },
+        "actions": {
+            "Initialize_variables": {
+                "runAfter": {},
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "ProductsArray",
+                            "type": "array",
+                            "value": [
+                                {
+                                    "Description": "Apples",
+                                    "Product_id": 1
+                                },
+                                {
+                                    "Description": "Oranges",
+                                    "Product_id": 2
+                                }
+                            ]
+                        },
+                        {
+                            "name": "RunCount",
+                            "type": "integer",
+                            "value": 0
+                        }
+                    ]
+                }
+            },
+            "Create_CSV_table": {
+                "runAfter": {
+                    "Initialize_variables": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Table",
+                "inputs": {
+                    "from": "@variables('ProductsArray')",
+                    "format": "CSV"
+                }
+            },
+            "Until": {
+                "actions": {
+                    "Send_email_(V2)": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['gmail']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "body": {
+                                "To": "derik7208@gmail.com",
+                                "Subject": "Run Count-@{variables('RunCount')}",
+                                "Body": "<p class=\"editor-paragraph\">@{body('Create_CSV_table')}</p>"
+                            },
+                            "path": "/v2/Mail"
+                        }
+                    },
+                    "Increment_variable": {
+                        "runAfter": {
+                            "Send_email_(V2)": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "IncrementVariable",
+                        "inputs": {
+                            "name": "RunCount",
+                            "value": 1
+                        }
+                    },
+                    "Delay": {
+                        "runAfter": {
+                            "Increment_variable": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Wait",
+                        "inputs": {
+                            "interval": {
+                                "count": 1,
+                                "unit": "Minute"
+                            }
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Create_CSV_table": [
+                        "Succeeded"
+                    ]
+                },
+                "expression": "@greaterOrEquals(variables('RunCount'),2)",
+                "limit": {
+                    "count": 60,
+                    "timeout": "PT1H"
+                },
+                "type": "Until"
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {
+                "gmail": {
+                    "id": "/subscriptions/f26515d9-3bc6-4a50-8192-cb816a833f54/providers/Microsoft.Web/locations/northcentralus/managedApis/gmail",
+                    "connectionId": "/subscriptions/f26515d9-3bc6-4a50-8192-cb816a833f54/resourceGroups/learn-f60950ee-5cf6-44c0-9084-7ae9848795c2/providers/Microsoft.Web/connections/gmail",
+                    "connectionName": "gmail"
+                }
+            }
+        }
+    }
+}
