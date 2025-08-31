@@ -1,0 +1,153 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "users": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "user": {
+                                            "type": "string"
+                                        },
+                                        "group": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "actions": {
+            "Initialize_variables": {
+                "runAfter": {},
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "adminUsers",
+                            "type": "array",
+                            "value": []
+                        },
+                        {
+                            "name": "messages",
+                            "type": "array",
+                            "value": []
+                        }
+                    ]
+                }
+            },
+            "Process_Users_Scope": {
+                "actions": {
+                    "For_each": {
+                        "foreach": "@triggerBody()?['users']",
+                        "actions": {
+                            "Condition": {
+                                "actions": {
+                                    "Append_to_array_variable": {
+                                        "type": "AppendToArrayVariable",
+                                        "inputs": {
+                                            "name": "adminUsers",
+                                            "value": "@item()?['user']"
+                                        }
+                                    },
+                                    "Append_to_array_variable_1": {
+                                        "runAfter": {
+                                            "Append_to_array_variable": [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type": "AppendToArrayVariable",
+                                        "inputs": {
+                                            "name": "messages",
+                                            "value": "@concat(item()?['user'],' is a Admin')"
+                                        }
+                                    }
+                                },
+                                "else": {
+                                    "actions": {
+                                        "Append_to_array_variable_2": {
+                                            "type": "AppendToArrayVariable",
+                                            "inputs": {
+                                                "name": "messages",
+                                                "value": "@concat(item()?['user'],' is not a Admin')"
+                                            }
+                                        }
+                                    }
+                                },
+                                "expression": {
+                                    "and": [
+                                        {
+                                            "equals": [
+                                                "@item()?['group']",
+                                                "Admin"
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "type": "If"
+                            }
+                        },
+                        "type": "Foreach"
+                    },
+                    "Compose": {
+                        "runAfter": {
+                            "For_each": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Compose",
+                        "inputs": "@variables('messages')"
+                    }
+                },
+                "runAfter": {
+                    "Initialize_variables": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Scope"
+            },
+            "Response": {
+                "runAfter": {
+                    "Process_Users_Scope": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Response",
+                "kind": "Http",
+                "inputs": {
+                    "statusCode": 200,
+                    "body": {
+                        "adminUsers": "@variables('adminUsers')",
+                        "messages": "@variables('messages')"
+                    }
+                }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {}
+        }
+    }
+}
