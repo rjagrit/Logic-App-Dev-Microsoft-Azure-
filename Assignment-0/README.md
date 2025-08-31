@@ -1,93 +1,37 @@
-# ProductCSVLogicApp — Step-by-step README
+# Ass-0: Convert Products Array to CSV and Upload to Azure Blob Storage
 
-## Overview
-
-**ProductCSVLogicApp** is an Azure **Consumption Logic App** that receives a JSON payload (list of products) via an HTTP endpoint, converts the JSON product array into a CSV file, and uploads that CSV to an Azure Blob Storage container as `Product.csv`.
+This Logic App receives a list of products via an HTTP POST request, converts it into a CSV table, and uploads it to **Azure Blob Storage**.
 
 ---
 
-## Prerequisites
+## 🚀 Features
 
-- An **Azure subscription** with permissions to create Logic Apps and Storage Accounts.
-- A **Storage Account** and a blob **container** (example name: `product-data`).
-- Optional: Azure CLI or Postman / curl to test the HTTP trigger.
-
----
-
-## Files included
-
-- `README.md` (this file)
-- Example request body (use this as `input.json` when testing)
-
-### Example Input (input.json)
-
-```json
-{
-  "products": [
-    {
-      "productId": 1,
-      "productName": "Chair",
-      "description": "Comfortable chair for home or office",
-      "price": 49.99,
-      "quantity": 100
-    },
-    {
-      "productId": 2,
-      "productName": "Desk",
-      "description": "Large desk with plenty of workspace",
-      "price": 149.99,
-      "quantity": 50
-    },
-    {
-      "productId": 3,
-      "productName": "Bookshelf",
-      "description": "Tall bookshelf for storing books and decorations",
-      "price": 79.99,
-      "quantity": 75
-    }
-  ]
-}
-```
+- Triggered via **HTTP POST request**  
+- Converts JSON array of products into **CSV format**  
+- Uploads the CSV as a blob to **Azure Blob Storage**  
+- Supports **chunked transfer** for large files  
 
 ---
 
-## Step-by-step: Create the Logic App & Blob flow
+## 🛠 Steps to Create
 
-### Step 1 — Create (or use) an Azure Storage Account + Container
-
-1. In Azure Portal, go to **Storage accounts** → **+ Create**.
-2. Fill required fields (Subscription, Resource group, Region). Create the account.
-3. After creation, open the storage account → **Containers** → **+ Container**.
-4. Name the container `product-data` (or your preferred name) and set access level (usually **Private**).
-
-> **Optional (CLI)**:
->
-> ```bash
-> az storage account create --name MyStorageAcct --resource-group MyRG --location eastus
-> az storage container create --name product-data --account-name MyStorageAcct
-> ```
+### 1. Create the Logic App
+- Go to **Azure Portal → Create a Resource → Logic App (Consumption)**  
+- Select **Resource Group**, provide a **Logic App Name**, choose a **Region**, and click **Create**  
 
 ---
 
-### Step 2 — Create a Consumption Logic App
-
-1. In Azure Portal, search **Logic App** and click **+ Create**.
-2. Choose **Consumption** (NOT Standard) and fill:
-   - **Subscription**
-   - **Resource group**
-   - **Logic App name**: `ProductCSVLogicApp` (suggested)
-   - **Region**
-3. Click **Review + create** → **Create**.
+### 2. Open Logic App Designer
+- Open the deployed Logic App → **Logic App Designer**  
+- Select **Blank Logic App**  
 
 ---
 
-### Step 3 — Add the HTTP Trigger (When an HTTP request is received)
-
-1. Open the created Logic App and click **Logic App Designer**.
-2. Choose the template **When an HTTP request is received** (HTTP trigger).
-3. Click **Use sample payload to generate schema** and paste the **Example Input** JSON (from above). This will create the request JSON schema.
-
-**Generated JSON Schema (example)**
+### 3. Add Trigger: When a HTTP Request is Received
+- Search for **Request → When a HTTP request is received**  
+- Set **Method**: POST  
+- Add **JSON schema** for the products array:
+<img width="900" height="820" alt="4" src="https://github.com/user-attachments/assets/2cb3d47c-6e60-4146-a4cf-44510a8925bb" />
 
 ```json
 {
@@ -103,123 +47,29 @@
           "description": { "type": "string" },
           "price": { "type": "number" },
           "quantity": { "type": "integer" }
-        }
+        },
+        "required": ["productId","productName","description","price","quantity"]
       }
     }
   }
 }
 ```
+<img width="900" height="500" alt="2" src="https://github.com/user-attachments/assets/ce60d2bb-7e6b-4545-83e3-f96ee39837a5" />
+<img width="900" height="211" alt="3" src="https://github.com/user-attachments/assets/3360b29b-890c-49e8-9a2e-3795581b8f68" />
 
-> After saving the trigger, Logic Apps will show an HTTP POST URL (copy it for testing).
+### 4. Add Action: Create CSV Table
+- Add Data Operations → Create CSV Table
+- Configure:
+  - From: @triggerBody()?['products']
+  - Format: CSV
+ <img width="900" height="872" alt="5" src="https://github.com/user-attachments/assets/dc115135-2612-4c29-ba60-c719ddfaa25f" />
 
----
+## The Storage account Details
+<img width="900" height="868" alt="6" src="https://github.com/user-attachments/assets/71eda565-1471-4e1f-9de7-62122b99f787" />
+<img width="900" height="835" alt="7" src="https://github.com/user-attachments/assets/edda8113-2dda-4a18-83f0-2920243b8e12" />
+<img width="900" height="871" alt="8" src="https://github.com/user-attachments/assets/aca7fde9-04d1-4050-87f0-270d69c25319" />
+<img width="900" height="868" alt="9" src="https://github.com/user-attachments/assets/4dd297b0-214d-4e0f-bd8f-279b8cf3d59a" />
 
-### Step 4 — Add Data Operation: Create CSV Table
 
-1. Click **+ New step** → search **Data Operations** → select **Create CSV table**.
-2. In **From** field, provide the products array. Two options:
-   - **Dynamic content**: choose the `products` token from the trigger (if available), or
-   - **Expression**: click **Expression** and enter:
-     ```text
-     triggerBody()?['products']
-     ```
-     then click **OK** (this will appear as `@triggerBody()?['products']`).
-3. (Optional) For predictable column order, set **Columns** to **Custom** and add these columns in this order: `productId`, `productName`, `description`, `price`, `quantity`.
 
-**Note:** If `From` is empty or wrong, you will get validation errors (e.g. `WorkflowRunActionInputsMissingProperty`) — ensure you're passing the `products` array exactly.
 
----
-
-### Step 5 — Add Azure Blob Storage Action: Create Blob
-
-1. Click **+ New step** → search **Azure Blob Storage** → choose **Create blob**.
-2. If not connected, create a connection. You can:
-   - **Sign in with account key / connection string** (simple), **OR**
-   - Use **System-assigned managed identity** for the Logic App and grant it the **Storage Blob Data Contributor** role on the Storage Account.
-3. Configure the action:
-   - **Folder / Container**: `product-data` (the container you created)
-   - **Blob name**: `Product.csv` (or use an expression to add timestamp)
-   - **Blob content**: use the output of the _Create CSV table_ action. Enter the expression or dynamic content:
-     ```text
-     outputs('Create_CSV_table')
-     ```
-   - (Optional) Set **Content type** to `text/csv` if the connector exposes this property.
-
-**Optional Dynamic filename with timestamp**: If you want unique filenames,
-use a Compose or expression for the blob name, e.g.:
-
-```text
-concat('Product_', replace(replace(replace(utcNow(),':','-'),'T','_'),'.','-'), '.csv')
-```
-
-This avoids invalid characters in the filename.
-
----
-
-### Step 6 — Save and Test the Logic App
-
-1. Click **Save** in the Logic App designer.
-2. Copy the HTTP POST URL from the HTTP trigger.
-3. Test with curl or Postman.
-
-**cURL Example**
-
-```bash
-curl -X POST '<YOUR_HTTP_TRIGGER_URL>' \
-  -H 'Content-Type: application/json' \
-  -d @input.json
-```
-
-(Replace `<YOUR_HTTP_TRIGGER_URL>` with the trigger URL and ensure `input.json` contains the Example Input.)
-
-**Postman**
-
-- Create a POST request to the trigger URL.
-- Set `Content-Type: application/json`.
-- Paste the Example Input JSON in the body and send.
-
----
-
-### Step 7 — Verify Blob
-
-1. In Azure Portal, open your **Storage Account** → **Containers** → `product-data`.
-2. You should see `Product.csv` (or `Product_YYYY...csv` if you used timestamp).
-3. Click to download and open — it should look like:
-
-```csv
-productId,productName,description,price,quantity
-1,Chair,Comfortable chair for home or office,49.99,100
-2,Desk,Large desk with plenty of workspace,149.99,50
-3,Bookshelf,Tall bookshelf for storing books and decorations,79.99,75
-```
-
----
-
-## Troubleshooting & Tips
-
-- **Validation error (Create_CSV_table inputs missing)**: Ensure `Create CSV table` → **From** is set to `@triggerBody()?['products']` or the correct dynamic token.
-- **Blob connector errors / permission denied**: If you used managed identity, grant **Storage Blob Data Contributor** role to the Logic App's identity on the storage account. If using a connection string/key, verify the key and account name.
-- **Incorrect CSV headers or order**: Use **Custom** columns in the Create CSV Table action to force the header order.
-- **Large payloads / timeouts**: Consumption Logic Apps have runtime limits. For very large files, consider chunking or using an integration service.
-
----
-
-## Optional Enhancements
-
-- Add a **Response** action to return a 200 response with a short message or the blob URL.
-- Use a **Compose** action to create custom CSV headers or do string replacements before upload.
-- Add **error handling** (Scope + Configure run after + Send email) to capture failures.
-
----
-
-## Summary
-
-This Logic App receives product JSON, transforms it into CSV, and stores `Product.csv` in Azure Blob Storage. Follow the steps above to build, test, and verify. Adjust container names, action names, and filename expressions to match your environment.
-
----
-
-If you want, I can:
-
-- Add a ready-to-paste Logic Apps workflow definition (ARM template) for automation,
-- Add screenshots for each step, or
-- Add a small diagram of the flow for the README.
