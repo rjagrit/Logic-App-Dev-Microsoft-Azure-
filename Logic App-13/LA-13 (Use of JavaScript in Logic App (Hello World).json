@@ -1,0 +1,39 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "actions": {
+            "Execute_JavaScript_code": {
+                "type": "JavaScriptCode",
+                "inputs": {
+                    "code": "var text = \"Hello world from \" + workflowContext.workflow.name;\r\nreturn text;"
+                },
+                "runAfter": {}
+            },
+            "Response": {
+                "type": "Response",
+                "kind": "Http",
+                "inputs": {
+                    "statusCode": 200,
+                    "body": "@outputs('Execute_JavaScript_code')"
+                },
+                "runAfter": {
+                    "Execute_JavaScript_code": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "outputs": {},
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST"
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}
