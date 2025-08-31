@@ -1,0 +1,70 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_new_email_arrives": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['gmail']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/Mail/OnNewEmail",
+                    "queries": {
+                        "subject": "success or not",
+                        "importance": "All",
+                        "starred": "All",
+                        "fetchOnlyWithAttachments": false,
+                        "includeAttachments": false,
+                        "label": "INBOX"
+                    }
+                },
+                "recurrence": {
+                    "interval": 3,
+                    "frequency": "Minute"
+                }
+            }
+        },
+        "actions": {
+            "Reply_to_email_(V2)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['gmail']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "body": {
+                        "Subject": "Success",
+                        "Body": "<p class=\"editor-paragraph\">Hi, <br><br>It is an automation mail generation by email xxxxxxxx.2k@gmail.com<br><br>Thank you emailing,</p>"
+                    },
+                    "path": "/v2/Mail/ReplyTo/@{encodeURIComponent(triggerBody()?['Id'])}"
+                },
+                "runAfter": {}
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {
+                "gmail": {
+                    "id": "/subscriptions/f27a2135-1ae7-44b2-b514-f0b7b1dcbfba/providers/Microsoft.Web/locations/centralindia/managedApis/gmail",
+                    "connectionId": "/subscriptions/f27a2135-1ae7-44b2-b514-f0b7b1dcbfba/resourceGroups/learn-aba8c6d8-440e-4bd8-8257-75e78f2e008a/providers/Microsoft.Web/connections/gmail",
+                    "connectionName": "gmail"
+                }
+            }
+        }
+    }
+}
