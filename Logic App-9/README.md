@@ -43,6 +43,9 @@ What it does: This **Logic App** receives a user's details via HTTP POST, extrac
       }
     }
     ```
+<img width="600" height="685" alt="image" src="https://github.com/user-attachments/assets/b47a5c0a-137b-4238-aa6b-06cad3991782" />
+<img width="600" height="501" alt="image" src="https://github.com/user-attachments/assets/c2b1094a-6f53-4a8c-a233-a10e5eb9a69c" />
+
 
 ---
 
@@ -56,6 +59,7 @@ What it does: This **Logic App** receives a user's details via HTTP POST, extrac
     "userEmail": "@{triggerBody()?['email']}"
   }
   ```
+<img width="600" height="441" alt="image" src="https://github.com/user-attachments/assets/700a4b14-e9a9-4e3d-b717-fda2a4845134" />
 
 ---
 
@@ -74,6 +78,7 @@ What it does: This **Logic App** receives a user's details via HTTP POST, extrac
       }
     }
     ```
+<img width="600" height="803" alt="image" src="https://github.com/user-attachments/assets/3e3138c5-7dfc-464c-a713-9b151be27222" />
 
 ---
 
@@ -90,6 +95,7 @@ What it does: This **Logic App** receives a user's details via HTTP POST, extrac
       "User-Email": "@{body('Parse_JSON')?['userEmail']}"
     }
     ```
+<img width="600" height="747" alt="image" src="https://github.com/user-attachments/assets/e6b12ef6-b243-4b44-a001-b221c4d64701" />
 
 ---
 
@@ -106,3 +112,11 @@ What it does: This **Logic App** receives a user's details via HTTP POST, extrac
   "role": "Admin"
 }
 ```
+## The Output
+<img width="900" height="401" alt="image" src="https://github.com/user-attachments/assets/c3e9da7b-8d6a-40b4-860f-83aec3cae762" />
+
+---
+### The Workflow
+<img width="600" height="769" alt="image" src="https://github.com/user-attachments/assets/3e47b556-0045-48f2-9113-022a7e8252db" />
+
+
