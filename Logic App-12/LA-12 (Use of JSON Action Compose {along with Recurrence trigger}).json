@@ -1,0 +1,170 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "Recurrence": {
+                "recurrence": {
+                    "interval": 30,
+                    "frequency": "Second",
+                    "timeZone": "India Standard Time"
+                },
+                "evaluatedRecurrence": {
+                    "interval": 30,
+                    "frequency": "Second",
+                    "timeZone": "India Standard Time"
+                },
+                "type": "Recurrence",
+                "conditions": []
+            }
+        },
+        "actions": {
+            "firstNameVariable": {
+                "runAfter": {},
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "firstName",
+                            "type": "string",
+                            "value": "Jagrit"
+                        }
+                    ]
+                }
+            },
+            "lastNameVariable": {
+                "runAfter": {
+                    "firstNameVariable": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "lastName",
+                            "type": "string",
+                            "value": "Rattan"
+                        }
+                    ]
+                }
+            },
+            "ageVariable": {
+                "runAfter": {
+                    "lastNameVariable": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "ageVar",
+                            "type": "integer",
+                            "value": 24
+                        }
+                    ]
+                }
+            },
+            "counterVariable": {
+                "runAfter": {
+                    "ageVariable": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "runCount",
+                            "type": "integer",
+                            "value": 0
+                        }
+                    ]
+                }
+            },
+            "Increment_variable": {
+                "runAfter": {
+                    "counterVariable": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "IncrementVariable",
+                "inputs": {
+                    "name": "runCount",
+                    "value": 1
+                }
+            },
+            "Condition": {
+                "actions": {
+                    "Compose": {
+                        "type": "Compose",
+                        "inputs": {
+                            "Age": "@{variables('ageVar')}",
+                            "Full-Name": "@{variables('firstName')},@{variables('lastName')}"
+                        }
+                    },
+                    "Send_email_(V2)": {
+                        "runAfter": {
+                            "Compose": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['gmail']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "body": {
+                                "To": "derik7208@gmail.com",
+                                "Body": "<p class=\"editor-paragraph\">Result of Compose Action:</p><br><p class=\"editor-paragraph\">@{outputs('Compose')}</p>"
+                            },
+                            "path": "/v2/Mail"
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Increment_variable": [
+                        "Succeeded"
+                    ]
+                },
+                "else": {
+                    "actions": {}
+                },
+                "expression": {
+                    "and": [
+                        {
+                            "less": [
+                                "@variables('runCount')",
+                                3
+                            ]
+                        }
+                    ]
+                },
+                "type": "If"
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {
+                "gmail": {
+                    "id": "/subscriptions/f27a2135-1ae7-44b2-b514-f0b7b1dcbfba/providers/Microsoft.Web/locations/centralindia/managedApis/gmail",
+                    "connectionId": "/subscriptions/f27a2135-1ae7-44b2-b514-f0b7b1dcbfba/resourceGroups/learn-415f3b26-748e-468b-8080-68be2b98da49/providers/Microsoft.Web/connections/gmail",
+                    "connectionName": "gmail"
+                }
+            }
+        }
+    }
+}
