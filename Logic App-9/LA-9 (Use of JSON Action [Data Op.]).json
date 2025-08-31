@@ -1,0 +1,91 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "role": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "actions": {
+            "Compose": {
+                "runAfter": {},
+                "type": "Compose",
+                "inputs": {
+                    "userName": "@{triggerBody()?['name']}",
+                    "userEmail": "@{triggerBody()?['email']}"
+                }
+            },
+            "Parse_JSON": {
+                "runAfter": {
+                    "Compose": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ParseJson",
+                "inputs": {
+                    "content": "@outputs('Compose')",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "userName": {
+                                "type": "string"
+                            },
+                            "userEmail": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "Response": {
+                "runAfter": {
+                    "Parse_JSON": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Response",
+                "kind": "Http",
+                "inputs": {
+                    "statusCode": 200,
+                    "body": {
+                        "status": "succeed",
+                        "User-Name": "@{body('Parse_JSON')?['userName']}",
+                        "User-Email": "@{body('Parse_JSON')?['userEmail']}"
+                    }
+                }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {}
+        }
+    }
+}
