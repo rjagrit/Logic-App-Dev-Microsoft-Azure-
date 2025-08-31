@@ -1,0 +1,59 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "actions": {
+            "Compose": {
+                "type": "Compose",
+                "inputs": "@concat('Hello ',triggerBody()?['name'],' -> message from branch-1')",
+                "runAfter": {}
+            },
+            "Compose_1": {
+                "type": "Compose",
+                "inputs": "@concat('Your task is: ',triggerBody()?['task'],' -> message from branch-2')",
+                "runAfter": {}
+            },
+            "Response": {
+                "type": "Response",
+                "kind": "Http",
+                "inputs": {
+                    "statusCode": 200,
+                    "body": {
+                        "branch1Result": "@outputs('Compose')",
+                        "branch2Result": "@outputs('Compose_1')"
+                    }
+                },
+                "runAfter": {
+                    "Compose_1": [
+                        "SUCCEEDED"
+                    ],
+                    "Compose": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "outputs": {},
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "task": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}
