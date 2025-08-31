@@ -1,0 +1,116 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "actions": {
+            "Switch": {
+                "type": "Switch",
+                "expression": "@triggerBody()?['order_status']",
+                "default": {
+                    "actions": {
+                        "Response_3": {
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 500,
+                                "body": {
+                                    "Message": "We have not found your order"
+                                }
+                            }
+                        }
+                    }
+                },
+                "cases": {
+                    "Released": {
+                        "actions": {
+                            "Response": {
+                                "type": "Response",
+                                "kind": "Http",
+                                "inputs": {
+                                    "statusCode": 201,
+                                    "body": {
+                                        "Message": "@{concat('Your order is ',triggerBody()?['order_status'])}"
+                                    }
+                                }
+                            }
+                        },
+                        "case": "Released"
+                    },
+                    "Confirmed": {
+                        "actions": {
+                            "Response_1": {
+                                "type": "Response",
+                                "kind": "Http",
+                                "inputs": {
+                                    "statusCode": 200,
+                                    "body": {
+                                        "Message": "@{concat('Your order is ',triggerBody()?['order_status'])}"
+                                    }
+                                }
+                            }
+                        },
+                        "case": "Confirmed"
+                    },
+                    "Return": {
+                        "actions": {
+                            "Response_2": {
+                                "type": "Response",
+                                "kind": "Http",
+                                "inputs": {
+                                    "statusCode": 300,
+                                    "body": {
+                                        "Message": "@{concat('Your order is ',triggerBody()?['order_status'])}"
+                                    }
+                                }
+                            }
+                        },
+                        "case": "Return"
+                    }
+                },
+                "runAfter": {}
+            }
+        },
+        "outputs": {},
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "order_status": {
+                                "type": "string"
+                            },
+                            "contact": {
+                                "type": "object",
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string"
+                                    },
+                                    "last_name": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "contact": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "order_number": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}
