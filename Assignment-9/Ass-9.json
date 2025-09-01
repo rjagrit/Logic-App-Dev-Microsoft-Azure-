@@ -1,0 +1,53 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "actions": {
+            "Execute_JavaScript_code": {
+                "type": "JavaScriptCode",
+                "inputs": {
+                    "code": "// Get the number from HTTP trigger\r\nlet input = workflowContext.trigger.outputs.body;\r\nlet num = input.number;\r\n\r\n// Check if number is undefined, null, or invalid\r\nif (num === null || num === undefined || isNaN(num) || num === \"\") {\r\n    return { result: \"Input is undefined, null, or not a valid number!\" };\r\n}\r\n\r\n// Handle negative numbers as non-palindrome\r\nif (num < 0) {\r\n    return { \r\n        number: num, \r\n        isPalindrome: false, \r\n        message: \"Negative numbers are not considered palindrome\" \r\n    };\r\n}\r\n\r\n// Initialize variables\r\nlet originalNum = num;\r\nlet reversedNum = 0;\r\n\r\n// Reverse the number mathematically\r\nwhile (num > 0) {\r\n    let digit = num % 10;          // Get last digit\r\n    reversedNum = reversedNum * 10 + digit; // Build reversed number\r\n    num = Math.floor(num / 10);    // Remove last digit\r\n}\r\n\r\n// Check palindrome\r\nlet isPalindrome = originalNum === reversedNum;\r\n\r\nreturn { \r\n    number: originalNum, \r\n    isPalindrome: isPalindrome, \r\n    message: isPalindrome ? \"Number is a palindrome\" : \"Number is not a palindrome\" \r\n};\r\n"
+                },
+                "runAfter": {}
+            },
+            "Response": {
+                "type": "Response",
+                "kind": "Http",
+                "inputs": {
+                    "statusCode": 200,
+                    "body": "@outputs('Execute_JavaScript_code')"
+                },
+                "runAfter": {
+                    "Execute_JavaScript_code": [
+                        "SUCCEEDED"
+                    ]
+                }
+            }
+        },
+        "outputs": {},
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http",
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "number": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "number"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "kind": "Stateful"
+}

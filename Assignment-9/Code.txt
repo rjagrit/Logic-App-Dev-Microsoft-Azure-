@@ -1,0 +1,37 @@
+// Get the number from HTTP trigger
+let input = workflowContext.trigger.outputs.body;
+let num = input.number;
+
+// Check if number is undefined, null, or invalid
+if (num === null || num === undefined || isNaN(num) || num === "") {
+    return { result: "Input is undefined, null, or not a valid number!" };
+}
+
+// Handle negative numbers as non-palindrome
+if (num < 0) {
+    return { 
+        number: num, 
+        isPalindrome: false, 
+        message: "Negative numbers are not considered palindrome" 
+    };
+}
+
+// Initialize variables
+let originalNum = num;
+let reversedNum = 0;
+
+// Reverse the number mathematically
+while (num > 0) {
+    let digit = num % 10;          // Get last digit
+    reversedNum = reversedNum * 10 + digit; // Build reversed number
+    num = Math.floor(num / 10);    // Remove last digit
+}
+
+// Check palindrome
+let isPalindrome = originalNum === reversedNum;
+
+return { 
+    number: originalNum, 
+    isPalindrome: isPalindrome, 
+    message: isPalindrome ? "Number is a palindrome" : "Number is not a palindrome" 
+};
