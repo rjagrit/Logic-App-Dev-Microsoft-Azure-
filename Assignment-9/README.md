@@ -96,9 +96,10 @@ return {
 <img width="1920" height="1080" alt="Screenshot (2295)" src="https://github.com/user-attachments/assets/d6c33218-c930-4365-88d5-012174949496" />
 
 ### 4. Add Response Action
-- Add Response action.
+- Add Response action
 - Set:
   - Status Code → 200
   - Body → @outputs('Execute_JavaScript_code')
 <img width="1920" height="1080" alt="Screenshot (2296)" src="https://github.com/user-attachments/assets/f22bd980-6dfd-4fd9-be2a-b447fbc792cf" />
  
+
