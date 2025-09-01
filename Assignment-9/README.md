@@ -102,4 +102,9 @@ return {
   - Body → @outputs('Execute_JavaScript_code')
 <img width="1920" height="1080" alt="Screenshot (2296)" src="https://github.com/user-attachments/assets/f22bd980-6dfd-4fd9-be2a-b447fbc792cf" />
  
+### The Output
+<img width="1447" height="599" alt="image" src="https://github.com/user-attachments/assets/b5a89461-7b3f-47ee-937f-02bff5c30e88" />
+<img width="1433" height="546" alt="image" src="https://github.com/user-attachments/assets/490b3ed0-6cbb-402b-803a-d783790a82ad" />
+<img width="1398" height="505" alt="image" src="https://github.com/user-attachments/assets/1a4a3a87-4aef-4e2b-ba6a-4557e9e7d773" />
+
 
