@@ -1,0 +1,144 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "actions": {
+            "Check_Attachment_Presence": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        {
+                            "greater": [
+                                "@length(triggerOutputs()?['body/attachments'])\r\n",
+                                0
+                            ]
+                        }
+                    ]
+                },
+                "actions": {
+                    "For_each": {
+                        "type": "foreach",
+                        "foreach": "@triggerBody()?['Attachments']",
+                        "actions": {
+                            "Parse_JSON": {
+                                "type": "ParseJson",
+                                "inputs": {
+                                    "content": "@base64ToString(item()?['ContentBytes'])",
+                                    "schema": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "salary": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "name",
+                                                "salary"
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            "Execute_JavaScript_code": {
+                                "type": "JavaScriptCode",
+                                "inputs": {
+                                    "code": "let data = workflowContext.actions.Parse_JSON.outputs.body;\r\nlet headers = Object.keys(data[0]);\r\nlet csv = headers.join(\",\") + \"\\n\";\r\ndata.forEach(row => {\r\n    csv += headers.map(h => row[h]).join(\",\") + \"\\n\";\r\n});\r\nreturn csv;   // ✅ return plain string, not an object\r\n"
+                                },
+                                "runAfter": {
+                                    "Parse_JSON": [
+                                        "SUCCEEDED"
+                                    ]
+                                }
+                            },
+                            "Create_blob_(V2)": {
+                                "type": "ApiConnection",
+                                "inputs": {
+                                    "host": {
+                                        "connection": {
+                                            "referenceName": "azureblob"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "body": "@outputs('Execute_JavaScript_code')",
+                                    "headers": {
+                                        "ReadFileMetadataFromServer": true
+                                    },
+                                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files",
+                                    "queries": {
+                                        "folderPath": "/outputfiles",
+                                        "name": "converted.csv",
+                                        "queryParametersSingleEncoded": true
+                                    }
+                                },
+                                "runAfter": {
+                                    "Execute_JavaScript_code": [
+                                        "SUCCEEDED"
+                                    ]
+                                },
+                                "runtimeConfiguration": {
+                                    "contentTransfer": {
+                                        "transferMode": "Chunked"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "else": {
+                    "actions": {}
+                },
+                "runAfter": {}
+            }
+        },
+        "outputs": {},
+        "triggers": {
+            "When_a_new_email_arrives_(V2)": {
+                "type": "ApiConnectionNotification",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "outlook"
+                        }
+                    },
+                    "fetch": {
+                        "pathTemplate": {
+                            "template": "/v2/Mail/OnNewEmail"
+                        },
+                        "method": "get",
+                        "queries": {
+                            "importance": "Any",
+                            "fetchOnlyWithAttachment": true,
+                            "includeAttachments": true,
+                            "folderPath": "Inbox"
+                        }
+                    },
+                    "subscribe": {
+                        "body": {
+                            "NotificationUrl": "@listCallbackUrl()"
+                        },
+                        "pathTemplate": {
+                            "template": "/MailSubscriptionPoke/$subscriptions"
+                        },
+                        "method": "post",
+                        "queries": {
+                            "importance": "Any",
+                            "fetchOnlyWithAttachment": true,
+                            "folderPath": "Inbox"
+                        }
+                    }
+                },
+                "splitOn": "@triggerBody()?['value']"
+            }
+        }
+    },
+    "kind": "Stateful"
+}
