@@ -1,89 +1,65 @@
-# Storage Account & CSV Upload — Step-by-step README
+# Azure Service Bus Topic & Subscription with Filter
 
-## Overview
-
-This README shows **exact, step-by-step** instructions to:
-
-1. Create an **Azure Storage Account** (Portal + CLI).
-2. Create a **Blob Container**.
-3. Create a **CSV file (StudentDetails.csv)** and upload it to the container (Portal + CLI).
-
-Use this when you want to store student details as CSV in Azure Blob Storage.
+This guide explains how to create an **Azure Service Bus Topic** with **Subscriptions** that filter messages based on the `MessageType` property.
 
 ---
 
-## Prerequisites
+## 🚀 Steps
 
-- An **Azure subscription** with permission to create resources.
-- (Optional but recommended) **Azure CLI** installed locally. See https://docs.microsoft.com/cli/azure/install-azure-cli for installation.
-- Basic familiarity with Azure Portal.
-
----
-
-## Example CSV (StudentDetails.csv)
-
-Create a file named `StudentDetails.csv` with the following content:
-
-```csv
-Name,Age
-Rahul,25
-Anita,30
-```
-
-You can create this file with any text editor or run (macOS / Linux / WSL / Git Bash):
-
-```bash
-cat > StudentDetails.csv <<'CSV'
-Name,Age
-Rahul,25
-Anita,30
-CSV
-```
+### 1. Create a Service Bus Namespace
+1. Go to **Azure Portal** → Search for **Service Bus**.
+2. Click **+ Create**.
+3. Fill in:
+   - **Resource Group** → Choose or create one.
+   - **Namespace Name** → e.g., `myservicebusns`.
+   - **Pricing Tier** → Select **Standard** (needed for Topics & Subscriptions).
+   - **Region** → Select nearest region.
+4. Click **Review + Create** → **Create**.
 
 ---
 
-## PART A — Using Azure Portal (GUI)
-
-### Step-1: Create a Resource Group (optional but recommended)
-
-1. Sign in to the **Azure Portal** (https://portal.azure.com).
-2. Search for **Resource groups** and click **+ Create**.
-3. Select Subscription, give it a name (example: `rg-student-csv`), pick a Region, then **Review + create** → **Create**.
-
-### Step-2: Create a Storage Account
-
-1. In Portal search box type **Storage accounts** → click **+ Create**.
-2. Under **Basics** fill the required fields:
-   - **Subscription**: your subscription.
-   - **Resource group**: choose the RG created above (or select an existing one).
-   - **Storage account name**: must be globally unique, lowercase, 3–24 characters (example: `jagritstorageacct123`).
-   - **Region**: nearest region (e.g., `Central India`).
-   - **Performance**: **Standard** (default).
-   - **Redundancy**: **Locally-redundant storage (LRS)** is cheapest and fine for testing.
-3. Leave other defaults unless you have network/security requirements.
-4. Click **Review + create** → ensure validation passes → **Create**.
-
-Wait a couple minutes for deployment.
-
-### Step-3: Create a Blob Container
-
-1. Open the created Storage Account from the Portal (search the account name).
-2. In the left menu under **Data storage** click **Containers**.
-3. Click **+ Container**.
-   - **Name**: `csvfiles` (or any valid lowercase name).
-   - **Public access level**: set to **Private (no anonymous access)**.
-4. Click **Create**.
-
-### Step-4: Upload the CSV via Portal
-
-1. Inside the `csvfiles` container click **Upload**.
-2. **Browse** → choose the `StudentDetails.csv` file you created.
-3. (Optional) Under Advanced make sure **Content type** shows `text/csv`.
-4. Click **Upload**.
-
-### Step-5: Verify
-
-1. After upload you will see `StudentDetails.csv` listed in the container.
-2. Click the blob name → click **Download** to open it locally and inspect the CSV contents.
+### 2. Create a Topic
+1. Open your **Service Bus Namespace** → **Topics**.
+2. Click **+ Topic**.
+3. Enter a name → e.g., `orders-topic`.
+4. Save.
 
 ---
+
+### 3. Create a Subscription
+1. Inside the topic → Go to **Subscriptions**.
+2. Click **+ Subscription**.
+3. Provide a name → e.g., `electronics-subscription`.
+4. Save.
+
+---
+
+### 4. Add a Filter Rule
+1. Inside the subscription → Go to **Rules**.
+2. Delete the default rule (`1=1`) if you don’t want all messages.
+3. Click **+ Add Rule**:
+   - **Name** → `MessageTypeFilter`.
+   - **Filter Type** → SQL Filter.
+   - **SQL Filter Condition**:
+     ```sql
+     MessageType = 'Electronics'
+     ```
+   - Save.
+
+Now, this subscription will **only receive messages** where the `MessageType` property equals `Electronics`.
+
+---
+
+### 5. Send a Message with `MessageType` Property
+
+#### Example in **C#**
+```csharp
+using Azure.Messaging.ServiceBus;
+
+var client = new ServiceBusClient("<connection-string>");
+var sender = client.CreateSender("orders-topic");
+
+var message = new ServiceBusMessage("Order details for Laptop");
+message.ApplicationProperties.Add("MessageType", "Electronics");
+
+await sender.SendMessageAsync(message);
