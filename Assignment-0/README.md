@@ -70,6 +70,53 @@ This Logic App receives a list of products via an HTTP POST request, converts it
 <img width="900" height="871" alt="8" src="https://github.com/user-attachments/assets/aca7fde9-04d1-4050-87f0-270d69c25319" />
 <img width="900" height="868" alt="9" src="https://github.com/user-attachments/assets/4dd297b0-214d-4e0f-bd8f-279b8cf3d59a" />
 
+## - To work on blob storage, copy the three fields:
+- Storage account Name
+- Key (that you get in **Security + networking -> Access Keys**
+- Connection string
+<img width="1920" height="861" alt="10" src="https://github.com/user-attachments/assets/21ad3135-4dce-4133-8ba9-6d5ef0f1a2cf" />
+
+### 5. Add Action: Create Blob (V2)
+- Add Azure Blob Storage → Create blob (V2) action
+<img width="1920" height="858" alt="12" src="https://github.com/user-attachments/assets/9f21f2cc-7380-48cb-8f2d-f0784a79977f" />
+
+- Choose the authentication type based on your choice. Here, we choose **Access key** means we authenticate using **Access key**. 
+<img width="1920" height="858" alt="12" src="https://github.com/user-attachments/assets/9c34f0d1-0479-4f3c-b28c-e9ca23a3c34a" />
+
+- Fill the required fields like Storage account name, the key that we mentioned above.
+<img width="1920" height="871" alt="13" src="https://github.com/user-attachments/assets/06f2e148-2d44-4101-bf44-8690e4aa5cc4" />
+
+- Now again fill details like storage account name, folder path(file location), blob name, blob content, content type(if needed) 
+<img width="1920" height="858" alt="14" src="https://github.com/user-attachments/assets/f1dc944e-54c0-4163-a2c4-5d28cffd16c5" />
+<img width="1920" height="867" alt="15" src="https://github.com/user-attachments/assets/ab58af41-dcbf-4563-a691-f8e807cfa23d" />
+<img width="1920" height="863" alt="16" src="https://github.com/user-attachments/assets/4caff9cb-3477-44de-b7fa-f585c733d9a6" />
+<img width="1920" height="864" alt="17" src="https://github.com/user-attachments/assets/f6cb9a34-9cf9-4c09-9720-4f9d1fcec514" />
+
+## The Output
+- Save the Workflow and just copy the link generated, paste it along with the Raw Data as JSON 
+<img width="1920" height="1019" alt="19" src="https://github.com/user-attachments/assets/ddfde34f-812c-41ea-9178-ad7c0948e9d9" />
+<img width="1920" height="1024" alt="20" src="https://github.com/user-attachments/assets/fe79891b-1bd1-499a-b75f-ca10640c9de0" />
+
+- Here you see the pracBlob that we gave a name to our blob, open it, and download it to see the data inside. 
+<img width="1920" height="868" alt="21" src="https://github.com/user-attachments/assets/f7a2866f-5cbe-4b5a-bb3c-be4db81ddc8f" />
+
+- Downloaded CSV file9pracBlob)
+- open it in Notepad to evaluate, though
+<img width="1920" height="1024" alt="23" src="https://github.com/user-attachments/assets/27c83d42-bb47-47f5-9c87-1cc8fb0f87e9" />
+
+### The Workflow
+<img width="1920" height="861" alt="18" src="https://github.com/user-attachments/assets/80b7117d-5267-4da4-856e-edc47a3a448d" />
+
+
+
+
+
+
+
+
+
+
+
 
 
 
