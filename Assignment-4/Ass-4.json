@@ -1,0 +1,70 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "Recurrence": {
+                "type": "Recurrence",
+                "recurrence":"@parameters('timerConfig')"
+            }
+        },
+        "actions": {},
+        "outputs": {},
+        "parameters": {
+            "timerConfig": {
+                "type": "Object",
+                "defaultValue": {
+                    "interval": 1,
+                    "frequency": "Week",
+                    "timeZone": "AUS Eastern Standard Time",
+                    "startTime": "2025-08-28T00:00:00",
+                    "schedule": {
+                        "weekDays": [
+                            "Monday",
+                            "Friday"
+                        ],
+                        "hours": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15,
+                            16,
+                            17,
+                            18,
+                            19,
+                            20,
+                            21,
+                            22,
+                            23
+                        ],
+                        "minutes": [
+                            0
+                        ]
+                    }
+                }
+            },
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {}
+        }
+    }
+}
